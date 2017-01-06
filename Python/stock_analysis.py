@@ -34,7 +34,7 @@ def get_stock_data(start_date, end_date, symbols):
     for symbol in symbols:
         df_temp = create_stock_df(start_date, end_date, symbol)
         df = df.join(df_temp)
-        df.dropna()
+        df = df.dropna()
     return df
 
 if __name__ == "__main__":
@@ -45,8 +45,20 @@ if __name__ == "__main__":
     
     df = get_stock_data(start_date, end_date, symbols)
     df_sliced = df.ix['2016-01-04':'2016-12-30']
-    df_sliced = df_sliced / df_sliced.ix[0,:]
-    df_sliced[['AMD', 'NVDA', 'INTC']].plot()
+    #sliced normalized graph
+    #df_sliced = df_sliced / df_sliced.ix[0,:]
+    df_sliced[['AMD']].plot(label="Actual")
+    
+    r_mean = pd.rolling_mean(df_sliced, window=20)
+    r_std = pd.rolling_std(df_sliced, window=20)
+    
+    r_mean['AMD'].plot(label="MVA")
+    upper_band = r_mean + 2 * r_std
+    lower_band = r_mean + (-2) * r_std
+    
+    upper_band['AMD'].plot(label="Upper Band")
+    lower_band['AMD'].plot(label="Lower Band")
+    
     plt.show()
     
    
